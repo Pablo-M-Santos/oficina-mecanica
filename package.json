@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "json-server": "json-server --watch db.json --port 3001",
-    "start": "node server.cjs"
+    "start": "json-server db.json --host 0.0.0.0 --port $PORT"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
