@@ -1,6 +1,18 @@
-import { Box, Grid, Paper, Typography, Card, CardContent, CardHeader, List, ListItem, ListItemText, Divider } from '@mui/material';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Card,
+  CardContent,
+  CardHeader,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import api from "../services/api";
 
 interface Cliente {
   id: string;
@@ -32,9 +44,9 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const [clientesRes, veiculosRes, ordensRes] = await Promise.all([
-          axios.get('http://localhost:3001/clientes'),
-          axios.get('http://localhost:3001/veiculos'),
-          axios.get('http://localhost:3001/ordens_servico')
+          api.get("/clientes"),
+          api.get("/veiculos"),
+          api.get("/ordens_servico"),
         ]);
 
         setClientes(clientesRes.data);
@@ -42,7 +54,7 @@ const Dashboard = () => {
         setOrdensServico(ordensRes.data);
         setLoading(false);
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        console.error("Erro ao carregar dados:", error);
         setLoading(false);
       }
     };
@@ -53,12 +65,20 @@ const Dashboard = () => {
   // Calcular estatísticas
   const totalClientes = clientes.length;
   const totalVeiculos = veiculos.length;
-  const ordensEmAndamento = ordensServico.filter(ordem => ordem.status === 'Em andamento').length;
-  const faturamentoTotal = ordensServico.reduce((acc, ordem) => acc + ordem.valorTotal, 0);
+  const ordensEmAndamento = ordensServico.filter(
+    (ordem) => ordem.status === "Em andamento",
+  ).length;
+  const faturamentoTotal = ordensServico.reduce(
+    (acc, ordem) => acc + ordem.valorTotal,
+    0,
+  );
 
   // Ordenar ordens de serviço por data (mais recentes primeiro)
   const ordensRecentes = [...ordensServico]
-    .sort((a, b) => new Date(b.dataEntrada).getTime() - new Date(a.dataEntrada).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.dataEntrada).getTime() - new Date(a.dataEntrada).getTime(),
+    )
     .slice(0, 5);
 
   if (loading) {
@@ -74,34 +94,96 @@ const Dashboard = () => {
       <Grid container spacing={3}>
         {/* Cards de estatísticas */}
         <Grid item xs={10} sm={6} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }}>
-            <Typography variant="h6" color="primary">Clientes</Typography>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 2,
+              textAlign: "center",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minHeight: "160px",
+            }}
+          >
+            <Typography variant="h6" color="primary">
+              Clientes
+            </Typography>
             <Typography variant="h3">{totalClientes}</Typography>
-            <Typography variant="body2" color="text.secondary">Total cadastrado</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Total cadastrado
+            </Typography>
           </Paper>
         </Grid>
 
         <Grid item xs={10} sm={6} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }}>
-            <Typography variant="h6" color="primary">Veículos</Typography>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 2,
+              textAlign: "center",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minHeight: "160px",
+            }}
+          >
+            <Typography variant="h6" color="primary">
+              Veículos
+            </Typography>
             <Typography variant="h3">{totalVeiculos}</Typography>
-            <Typography variant="body2" color="text.secondary">Total cadastrado</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Total cadastrado
+            </Typography>
           </Paper>
         </Grid>
 
         <Grid item xs={10} sm={6} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }}>
-            <Typography variant="h6" color="primary">Ordens em Andamento</Typography>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 2,
+              textAlign: "center",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minHeight: "160px",
+            }}
+          >
+            <Typography variant="h6" color="primary">
+              Ordens em Andamento
+            </Typography>
             <Typography variant="h3">{ordensEmAndamento}</Typography>
-            <Typography variant="body2" color="text.secondary">Serviços em execução</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Serviços em execução
+            </Typography>
           </Paper>
         </Grid>
 
         <Grid item xs={10} sm={6} md={3}>
-          <Paper elevation={3} sx={{ p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }}>
-            <Typography variant="h6" color="primary">Faturamento</Typography>
-            <Typography variant="h3">R$ {faturamentoTotal.toFixed(2)}</Typography>
-            <Typography variant="body2" color="text.secondary">Total acumulado</Typography>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 2,
+              textAlign: "center",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              minHeight: "160px",
+            }}
+          >
+            <Typography variant="h6" color="primary">
+              Faturamento
+            </Typography>
+            <Typography variant="h3">
+              R$ {faturamentoTotal.toFixed(2)}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Total acumulado
+            </Typography>
           </Paper>
         </Grid>
 
@@ -113,20 +195,29 @@ const Dashboard = () => {
               {ordensRecentes.length > 0 ? (
                 <List>
                   {ordensRecentes.map((ordem) => {
-                    const veiculo = veiculos.find(v => v.id === ordem.veiculoId);
+                    const veiculo = veiculos.find(
+                      (v) => v.id === ordem.veiculoId,
+                    );
                     return (
                       <div key={ordem.id}>
                         <ListItem>
                           <ListItemText
-                            primary={`OS #${ordem.id} - ${veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Veículo não encontrado'}`}
+                            primary={`OS #${ordem.id} - ${veiculo ? `${veiculo.marca} ${veiculo.modelo}` : "Veículo não encontrado"}`}
                             secondary={
                               <>
-                                <Typography component="span" variant="body2" color="text.primary">
+                                <Typography
+                                  component="span"
+                                  variant="body2"
+                                  color="text.primary"
+                                >
                                   Status: {ordem.status}
                                 </Typography>
                                 <br />
                                 <Typography component="span" variant="body2">
-                                  Data: {new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')}
+                                  Data:{" "}
+                                  {new Date(
+                                    ordem.dataEntrada,
+                                  ).toLocaleDateString("pt-BR")}
                                 </Typography>
                                 <br />
                                 <Typography component="span" variant="body2">

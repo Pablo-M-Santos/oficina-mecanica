@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import api from "../services/api";
 import {
   Box,
   Button,
@@ -27,17 +27,17 @@ import {
   Grid,
   Chip,
   InputAdornment,
-  TableSortLabel
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PrintIcon from '@mui/icons-material/Print';
-import SearchIcon from '@mui/icons-material/Search';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import 'dayjs/locale/pt-br';
-import dayjs, { Dayjs } from 'dayjs';
+  TableSortLabel,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PrintIcon from "@mui/icons-material/Print";
+import SearchIcon from "@mui/icons-material/Search";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import "dayjs/locale/pt-br";
+import dayjs, { Dayjs } from "dayjs";
 
 interface OrdemServico {
   id: string;
@@ -96,23 +96,23 @@ interface OrdemServicoFormData {
 }
 
 const statusOptions = [
-  'Aguardando aprovação',
-  'Orçamento aprovado',
-  'Em andamento',
-  'Concluído',
-  'Entregue',
-  'Cancelado'
+  "Aguardando aprovação",
+  "Orçamento aprovado",
+  "Em andamento",
+  "Concluído",
+  "Entregue",
+  "Cancelado",
 ];
 
 const ordemVazia: OrdemServicoFormData = {
-  veiculoId: '',
+  veiculoId: "",
   dataEntrada: dayjs(),
   dataSaida: null,
-  status: 'Aguardando aprovação',
-  descricao: '',
+  status: "Aguardando aprovação",
+  descricao: "",
   servicosIds: [],
   pecasIds: [],
-  valorTotal: 0
+  valorTotal: 0,
 };
 
 const OrdensServico = () => {
@@ -128,28 +128,29 @@ const OrdensServico = () => {
   const [formData, setFormData] = useState<OrdemServicoFormData>(ordemVazia);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [ordemParaDeletar, setOrdemParaDeletar] = useState<string | null>(null);
-  const [filtro, setFiltro] = useState('');
-  const [filtroStatus, setFiltroStatus] = useState<string>('');
+  const [filtro, setFiltro] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState<string>("");
   const [ordenacao, setOrdenacao] = useState<{
-    campo: keyof OrdemServico | '';
-    direcao: 'asc' | 'desc';
-  }>({ campo: '', direcao: 'asc' });
+    campo: keyof OrdemServico | "";
+    direcao: "asc" | "desc";
+  }>({ campo: "", direcao: "asc" });
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error' | 'info' | 'warning'
+    message: "",
+    severity: "success" as "success" | "error" | "info" | "warning",
   });
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [ordensRes, veiculosRes, clientesRes, servicosRes, pecasRes] = await Promise.all([
-        axios.get('http://localhost:3001/ordens_servico'),
-        axios.get('http://localhost:3001/veiculos'),
-        axios.get('http://localhost:3001/clientes'),
-        axios.get('http://localhost:3001/servicos'),
-        axios.get('http://localhost:3001/pecas')
-      ]);
+      const [ordensRes, veiculosRes, clientesRes, servicosRes, pecasRes] =
+        await Promise.all([
+          api.get("/ordens_servico"),
+          api.get("/veiculos"),
+          api.get("/clientes"),
+          api.get("/servicos"),
+          api.get("/pecas"),
+        ]);
       const ordensData = ordensRes.data;
       setOrdens(ordensData);
       setOrdensFiltered(ordensData);
@@ -158,11 +159,11 @@ const OrdensServico = () => {
       setServicos(servicosRes.data);
       setPecas(pecasRes.data);
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error("Erro ao buscar dados:", error);
       setSnackbar({
         open: true,
-        message: 'Erro ao carregar dados',
-        severity: 'error'
+        message: "Erro ao carregar dados",
+        severity: "error",
       });
     } finally {
       setLoading(false);
@@ -183,7 +184,7 @@ const OrdensServico = () => {
         descricao: ordem.descricao,
         servicosIds: ordem.servicosIds,
         pecasIds: ordem.pecasIds,
-        valorTotal: ordem.valorTotal
+        valorTotal: ordem.valorTotal,
       });
       setEditingId(ordem.id);
     } else {
@@ -200,32 +201,38 @@ const OrdensServico = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSelectChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleDateChange = (date: Dayjs | null, field: 'dataEntrada' | 'dataSaida') => {
-    setFormData(prev => ({
+  const handleDateChange = (
+    date: Dayjs | null,
+    field: "dataEntrada" | "dataSaida",
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [field]: date
+      [field]: date,
     }));
   };
 
-  const handleMultiSelectChange = (e: any, field: 'servicosIds' | 'pecasIds') => {
+  const handleMultiSelectChange = (
+    e: any,
+    field: "servicosIds" | "pecasIds",
+  ) => {
     const { value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -234,35 +241,35 @@ const OrdensServico = () => {
     let total = 0;
 
     // Somar valor dos serviços
-    formData.servicosIds.forEach(servicoId => {
-      const servico = servicos.find(s => s.id === servicoId);
+    formData.servicosIds.forEach((servicoId) => {
+      const servico = servicos.find((s) => s.id === servicoId);
       if (servico) {
         total += servico.valor;
       }
     });
 
     // Somar valor das peças
-    formData.pecasIds.forEach(pecaId => {
-      const peca = pecas.find(p => p.id === pecaId);
+    formData.pecasIds.forEach((pecaId) => {
+      const peca = pecas.find((p) => p.id === pecaId);
       if (peca) {
         total += peca.preco;
       }
     });
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      valorTotal: total
+      valorTotal: total,
     }));
   }, [formData.servicosIds, formData.pecasIds, servicos, pecas]);
 
   const verificarEstoque = (pecasIds: string[]): boolean => {
     for (const pecaId of pecasIds) {
-      const peca = pecas.find(p => p.id === pecaId);
+      const peca = pecas.find((p) => p.id === pecaId);
       if (peca && peca.quantidade <= 0) {
         setSnackbar({
           open: true,
           message: `Peça ${peca.nome} não possui estoque disponível`,
-          severity: 'error'
+          severity: "error",
         });
         return false;
       }
@@ -272,11 +279,11 @@ const OrdensServico = () => {
 
   const atualizarEstoque = async (pecasIds: string[]) => {
     for (const pecaId of pecasIds) {
-      const peca = pecas.find(p => p.id === pecaId);
+      const peca = pecas.find((p) => p.id === pecaId);
       if (peca) {
-        await axios.put(`http://localhost:3001/pecas/${pecaId}`, {
+        await api.put(`/pecas/${pecaId}`, {
           ...peca,
-          quantidade: peca.quantidade - 1
+          quantidade: peca.quantidade - 1,
         });
       }
     }
@@ -292,40 +299,42 @@ const OrdensServico = () => {
       const ordemData = {
         ...formData,
         dataEntrada: formData.dataEntrada.toISOString(),
-        dataSaida: formData.dataSaida ? formData.dataSaida.toISOString() : null
+        dataSaida: formData.dataSaida ? formData.dataSaida.toISOString() : null,
       };
 
       if (editingId) {
         // Buscar ordem antiga para comparar peças
-        const ordemAntiga = ordens.find(o => o.id === editingId);
-        const novasPecas = formData.pecasIds.filter(p => !ordemAntiga?.pecasIds.includes(p));
+        const ordemAntiga = ordens.find((o) => o.id === editingId);
+        const novasPecas = formData.pecasIds.filter(
+          (p) => !ordemAntiga?.pecasIds.includes(p),
+        );
 
-        await axios.put(`http://localhost:3001/ordens_servico/${editingId}`, ordemData);
+        await api.put(`/ordens_servico/${editingId}`, ordemData);
         await atualizarEstoque(novasPecas);
 
         setSnackbar({
           open: true,
-          message: 'Ordem de serviço atualizada com sucesso',
-          severity: 'success'
+          message: "Ordem de serviço atualizada com sucesso",
+          severity: "success",
         });
       } else {
-        await axios.post('http://localhost:3001/ordens_servico', ordemData);
+        await api.post("/ordens_servico", ordemData);
         await atualizarEstoque(formData.pecasIds);
 
         setSnackbar({
           open: true,
-          message: 'Ordem de serviço adicionada com sucesso',
-          severity: 'success'
+          message: "Ordem de serviço adicionada com sucesso",
+          severity: "success",
         });
       }
       handleCloseForm();
       fetchData();
     } catch (error) {
-      console.error('Erro ao salvar ordem de serviço:', error);
+      console.error("Erro ao salvar ordem de serviço:", error);
       setSnackbar({
         open: true,
-        message: 'Erro ao salvar ordem de serviço',
-        severity: 'error'
+        message: "Erro ao salvar ordem de serviço",
+        severity: "error",
       });
     }
   };
@@ -343,19 +352,19 @@ const OrdensServico = () => {
   const handleDelete = async () => {
     if (ordemParaDeletar) {
       try {
-        await axios.delete(`http://localhost:3001/ordens_servico/${ordemParaDeletar}`);
+        await api.delete(`/ordens_servico/${ordemParaDeletar}`);
         setSnackbar({
           open: true,
-          message: 'Ordem de serviço excluída com sucesso',
-          severity: 'success'
+          message: "Ordem de serviço excluída com sucesso",
+          severity: "success",
         });
         fetchData();
       } catch (error) {
-        console.error('Erro ao excluir ordem de serviço:', error);
+        console.error("Erro ao excluir ordem de serviço:", error);
         setSnackbar({
           open: true,
-          message: 'Erro ao excluir ordem de serviço',
-          severity: 'error'
+          message: "Erro ao excluir ordem de serviço",
+          severity: "error",
         });
       }
       handleCloseDelete();
@@ -363,64 +372,71 @@ const OrdensServico = () => {
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const formatarValor = (valor: number) => {
-    return valor.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     });
   };
 
   const getVeiculoInfo = (veiculoId: string) => {
-    const veiculo = veiculos.find(v => v.id === veiculoId);
-    if (!veiculo) return 'Veículo não encontrado';
+    const veiculo = veiculos.find((v) => v.id === veiculoId);
+    if (!veiculo) return "Veículo não encontrado";
     return `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})`;
   };
 
   const getClienteInfo = (veiculoId: string) => {
-    const veiculo = veiculos.find(v => v.id === veiculoId);
-    if (!veiculo) return 'Cliente não encontrado';
+    const veiculo = veiculos.find((v) => v.id === veiculoId);
+    if (!veiculo) return "Cliente não encontrado";
 
-    const cliente = clientes.find(c => c.id === veiculo.clienteId);
-    return cliente ? cliente.nome : 'Cliente não encontrado';
+    const cliente = clientes.find((c) => c.id === veiculo.clienteId);
+    return cliente ? cliente.nome : "Cliente não encontrado";
   };
 
   const getStatusChipColor = (status: string) => {
     switch (status) {
-      case 'Aguardando aprovação':
-        return 'warning';
-      case 'Orçamento aprovado':
-        return 'info';
-      case 'Em andamento':
-        return 'primary';
-      case 'Concluído':
-        return 'success';
-      case 'Entregue':
-        return 'success';
-      case 'Cancelado':
-        return 'error';
+      case "Aguardando aprovação":
+        return "warning";
+      case "Orçamento aprovado":
+        return "info";
+      case "Em andamento":
+        return "primary";
+      case "Concluído":
+        return "success";
+      case "Entregue":
+        return "success";
+      case "Cancelado":
+        return "error";
       default:
-        return 'default';
+        return "default";
     }
   };
   const handlePrintOrdem = (ordem: OrdemServico) => {
     // Buscar informações relacionadas
-    const veiculo = veiculos.find(v => v.id === ordem.veiculoId);
-    const cliente = veiculo ? clientes.find(c => c.id === veiculo.clienteId) : null;
+    const veiculo = veiculos.find((v) => v.id === ordem.veiculoId);
+    const cliente = veiculo
+      ? clientes.find((c) => c.id === veiculo.clienteId)
+      : null;
 
     // Buscar serviços e peças
-    const servicosSelecionados = servicos.filter(s => ordem.servicosIds.includes(s.id));
-    const pecasSelecionadas = pecas.filter(p => ordem.pecasIds.includes(p.id));
+    const servicosSelecionados = servicos.filter((s) =>
+      ordem.servicosIds.includes(s.id),
+    );
+    const pecasSelecionadas = pecas.filter((p) =>
+      ordem.pecasIds.includes(p.id),
+    );
 
     // Criar conteúdo para impressão
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) {
       setSnackbar({
         open: true,
-        message: 'Não foi possível abrir a janela de impressão. Verifique se o bloqueador de pop-ups está desativado.',
-        severity: 'error'
+        message:
+          "Não foi possível abrir a janela de impressão. Verifique se o bloqueador de pop-ups está desativado.",
+        severity: "error",
       });
       return;
     }
@@ -524,15 +540,15 @@ const OrdensServico = () => {
           <div class="section-title">Informações do Cliente</div>
           <div class="info-row">
             <div class="info-label">Nome:</div>
-            <div class="info-value">${cliente ? cliente.nome : 'Cliente não encontrado'}</div>
+            <div class="info-value">${cliente ? cliente.nome : "Cliente não encontrado"}</div>
           </div>
           <div class="info-row">
             <div class="info-label">Telefone:</div>
-            <div class="info-value">${cliente ? cliente.telefone : '-'}</div>
+            <div class="info-value">${cliente ? cliente.telefone : "-"}</div>
           </div>
           <div class="info-row">
             <div class="info-label">Email:</div>
-            <div class="info-value">${cliente ? cliente.email : '-'}</div>
+            <div class="info-value">${cliente ? cliente.email : "-"}</div>
           </div>
         </div>
         
@@ -540,15 +556,15 @@ const OrdensServico = () => {
           <div class="section-title">Informações do Veículo</div>
           <div class="info-row">
             <div class="info-label">Marca/Modelo:</div>
-            <div class="info-value">${veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Veículo não encontrado'}</div>
+            <div class="info-value">${veiculo ? `${veiculo.marca} ${veiculo.modelo}` : "Veículo não encontrado"}</div>
           </div>
           <div class="info-row">
             <div class="info-label">Placa:</div>
-            <div class="info-value">${veiculo ? veiculo.placa : '-'}</div>
+            <div class="info-value">${veiculo ? veiculo.placa : "-"}</div>
           </div>
           <div class="info-row">
             <div class="info-label">Ano:</div>
-            <div class="info-value">${veiculo ? veiculo.ano : '-'}</div>
+            <div class="info-value">${veiculo ? veiculo.ano : "-"}</div>
           </div>
         </div>
         
@@ -556,11 +572,11 @@ const OrdensServico = () => {
           <div class="section-title">Detalhes da Ordem</div>
           <div class="info-row">
             <div class="info-label">Data de Entrada:</div>
-            <div class="info-value">${new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')}</div>
+            <div class="info-value">${new Date(ordem.dataEntrada).toLocaleDateString("pt-BR")}</div>
           </div>
           <div class="info-row">
             <div class="info-label">Data de Saída:</div>
-            <div class="info-value">${ordem.dataSaida ? new Date(ordem.dataSaida).toLocaleDateString('pt-BR') : 'Pendente'}</div>
+            <div class="info-value">${ordem.dataSaida ? new Date(ordem.dataSaida).toLocaleDateString("pt-BR") : "Pendente"}</div>
           </div>
           <div class="info-row">
             <div class="info-label">Status:</div>
@@ -568,7 +584,7 @@ const OrdensServico = () => {
           </div>
           <div class="info-row">
             <div class="info-label">Descrição:</div>
-            <div class="info-value">${ordem.descricao || 'Nenhuma descrição fornecida'}</div>
+            <div class="info-value">${ordem.descricao || "Nenhuma descrição fornecida"}</div>
           </div>
         </div>
         
@@ -584,17 +600,22 @@ const OrdensServico = () => {
               </tr>
             </thead>
             <tbody>
-              ${servicosSelecionados.length > 0 ?
-        servicosSelecionados.map(servico => `
+              ${
+                servicosSelecionados.length > 0
+                  ? servicosSelecionados
+                      .map(
+                        (servico) => `
                   <tr>
                     <td>${servico.nome}</td>
                     <td>${servico.descricao}</td>
                     <td>${servico.tempoEstimado}</td>
                     <td>${formatarValor(servico.valor)}</td>
                   </tr>
-                `).join('') :
-        '<tr><td colspan="4" style="text-align: center">Nenhum serviço registrado</td></tr>'
-      }
+                `,
+                      )
+                      .join("")
+                  : '<tr><td colspan="4" style="text-align: center">Nenhum serviço registrado</td></tr>'
+              }
             </tbody>
           </table>
         </div>
@@ -611,17 +632,22 @@ const OrdensServico = () => {
               </tr>
             </thead>
             <tbody>
-              ${pecasSelecionadas.length > 0 ?
-        pecasSelecionadas.map(peca => `
+              ${
+                pecasSelecionadas.length > 0
+                  ? pecasSelecionadas
+                      .map(
+                        (peca) => `
                   <tr>
                     <td>${peca.nome}</td>
                     <td>${peca.codigo}</td>
                     <td>${peca.marca}</td>
                     <td>${formatarValor(peca.preco)}</td>
                   </tr>
-                `).join('') :
-        '<tr><td colspan="4" style="text-align: center">Nenhuma peça utilizada</td></tr>'
-      }
+                `,
+                      )
+                      .join("")
+                  : '<tr><td colspan="4" style="text-align: center">Nenhuma peça utilizada</td></tr>'
+              }
             </tbody>
           </table>
         </div>
@@ -640,7 +666,7 @@ const OrdensServico = () => {
         </div>
         
         <div class="footer">
-          <p>Oficina Mecânica - Documento gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+          <p>Oficina Mecânica - Documento gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}</p>
         </div>
         
         <div class="no-print" style="text-align: center; margin-top: 20px;">
@@ -681,27 +707,31 @@ const OrdensServico = () => {
 
     // Aplicar filtro de texto
     if (textoFiltro) {
-      resultado = resultado.filter(ordem => {
+      resultado = resultado.filter((ordem) => {
         const clienteNome = getClienteInfo(ordem.veiculoId).toLowerCase();
         const veiculoInfo = getVeiculoInfo(ordem.veiculoId).toLowerCase();
-        const dataFormatada = new Date(ordem.dataEntrada).toLocaleDateString('pt-BR').toLowerCase();
+        const dataFormatada = new Date(ordem.dataEntrada)
+          .toLocaleDateString("pt-BR")
+          .toLowerCase();
         const valorFormatado = ordem.valorTotal.toString().toLowerCase();
 
-        return clienteNome.includes(textoFiltro) ||
+        return (
+          clienteNome.includes(textoFiltro) ||
           veiculoInfo.includes(textoFiltro) ||
           dataFormatada.includes(textoFiltro) ||
           valorFormatado.includes(textoFiltro) ||
-          ordem.status.toLowerCase().includes(textoFiltro);
+          ordem.status.toLowerCase().includes(textoFiltro)
+        );
       });
     }
 
     // Aplicar filtro de status
     if (statusFiltro) {
-      resultado = resultado.filter(ordem => ordem.status === statusFiltro);
+      resultado = resultado.filter((ordem) => ordem.status === statusFiltro);
     }
 
     // Aplicar ordenação se existir
-    if (ordenacao.campo !== '') {
+    if (ordenacao.campo !== "") {
       resultado = ordenarOrdens(resultado);
     }
 
@@ -710,54 +740,70 @@ const OrdensServico = () => {
 
   const handleOrdenacaoChange = (campo: keyof OrdemServico) => {
     const ehMesmoCampo = ordenacao.campo === campo;
-    const novaDirecao = ehMesmoCampo && ordenacao.direcao === 'asc' ? 'desc' : 'asc';
+    const novaDirecao =
+      ehMesmoCampo && ordenacao.direcao === "asc" ? "desc" : "asc";
 
     const novaOrdenacao: {
-      campo: keyof OrdemServico | '';
-      direcao: 'asc' | 'desc';
+      campo: keyof OrdemServico | "";
+      direcao: "asc" | "desc";
     } = {
       campo,
-      direcao: novaDirecao
+      direcao: novaDirecao,
     };
 
     setOrdenacao(novaOrdenacao);
     setOrdensFiltered(ordenarOrdens(ordensFiltered, campo, novaDirecao));
   };
 
-  const ordenarOrdens = (ordens: OrdemServico[], campo: keyof OrdemServico | '' = ordenacao.campo, direcao: 'asc' | 'desc' = ordenacao.direcao) => {
-    if (campo === '' || typeof campo !== 'string') return ordens;
+  const ordenarOrdens = (
+    ordens: OrdemServico[],
+    campo: keyof OrdemServico | "" = ordenacao.campo,
+    direcao: "asc" | "desc" = ordenacao.direcao,
+  ) => {
+    if (campo === "" || typeof campo !== "string") return ordens;
 
     return [...ordens].sort((a, b) => {
-      if (campo === 'valorTotal') {
-        return direcao === 'asc' ? a.valorTotal - b.valorTotal : b.valorTotal - a.valorTotal;
+      if (campo === "valorTotal") {
+        return direcao === "asc"
+          ? a.valorTotal - b.valorTotal
+          : b.valorTotal - a.valorTotal;
       }
 
-      if (campo === 'dataEntrada' || campo === 'dataSaida') {
-        const dataA = new Date(a[campo] || '').getTime();
-        const dataB = new Date(b[campo] || '').getTime();
-        return direcao === 'asc' ? dataA - dataB : dataB - dataA;
+      if (campo === "dataEntrada" || campo === "dataSaida") {
+        const dataA = new Date(a[campo] || "").getTime();
+        const dataB = new Date(b[campo] || "").getTime();
+        return direcao === "asc" ? dataA - dataB : dataB - dataA;
       }
 
-      if (campo === 'veiculoId') {
+      if (campo === "veiculoId") {
         const veiculoA = getVeiculoInfo(a.veiculoId).toLowerCase();
         const veiculoB = getVeiculoInfo(b.veiculoId).toLowerCase();
-        return direcao === 'asc'
-          ? veiculoA.localeCompare(veiculoB, 'pt-BR')
-          : veiculoB.localeCompare(veiculoA, 'pt-BR');
+        return direcao === "asc"
+          ? veiculoA.localeCompare(veiculoB, "pt-BR")
+          : veiculoB.localeCompare(veiculoA, "pt-BR");
       }
 
       const valorA = String(a[campo]).toLowerCase();
       const valorB = String(b[campo]).toLowerCase();
 
-      return direcao === 'asc'
-        ? valorA.localeCompare(valorB, 'pt-BR')
-        : valorB.localeCompare(valorA, 'pt-BR');
+      return direcao === "asc"
+        ? valorA.localeCompare(valorB, "pt-BR")
+        : valorB.localeCompare(valorA, "pt-BR");
     });
   };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" gutterBottom>
           Ordens de Serviço
         </Typography>
@@ -791,7 +837,9 @@ const OrdensServico = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <FormControl fullWidth variant="outlined">
-              <InputLabel id="filtro-status-label">Filtrar por Status</InputLabel>
+              <InputLabel id="filtro-status-label">
+                Filtrar por Status
+              </InputLabel>
               <Select
                 labelId="filtro-status-label"
                 value={filtroStatus}
@@ -811,7 +859,7 @@ const OrdensServico = () => {
       </Box>
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       ) : (
@@ -822,9 +870,13 @@ const OrdensServico = () => {
                 <TableCell>ID</TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'veiculoId'}
-                    direction={ordenacao.campo === 'veiculoId' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('veiculoId')}
+                    active={ordenacao.campo === "veiculoId"}
+                    direction={
+                      ordenacao.campo === "veiculoId"
+                        ? ordenacao.direcao
+                        : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("veiculoId")}
                   >
                     Cliente
                   </TableSortLabel>
@@ -832,27 +884,37 @@ const OrdensServico = () => {
                 <TableCell>Veículo</TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'dataEntrada'}
-                    direction={ordenacao.campo === 'dataEntrada' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('dataEntrada')}
+                    active={ordenacao.campo === "dataEntrada"}
+                    direction={
+                      ordenacao.campo === "dataEntrada"
+                        ? ordenacao.direcao
+                        : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("dataEntrada")}
                   >
                     Data de Entrada
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'status'}
-                    direction={ordenacao.campo === 'status' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('status')}
+                    active={ordenacao.campo === "status"}
+                    direction={
+                      ordenacao.campo === "status" ? ordenacao.direcao : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("status")}
                   >
                     Status
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'valorTotal'}
-                    direction={ordenacao.campo === 'valorTotal' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('valorTotal')}
+                    active={ordenacao.campo === "valorTotal"}
+                    direction={
+                      ordenacao.campo === "valorTotal"
+                        ? ordenacao.direcao
+                        : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("valorTotal")}
                   >
                     Valor Total
                   </TableSortLabel>
@@ -867,7 +929,9 @@ const OrdensServico = () => {
                     <TableCell>{ordem.id}</TableCell>
                     <TableCell>{getClienteInfo(ordem.veiculoId)}</TableCell>
                     <TableCell>{getVeiculoInfo(ordem.veiculoId)}</TableCell>
-                    <TableCell>{new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')}</TableCell>
+                    <TableCell>
+                      {new Date(ordem.dataEntrada).toLocaleDateString("pt-BR")}
+                    </TableCell>
                     <TableCell>
                       <Chip
                         label={ordem.status}
@@ -915,7 +979,9 @@ const OrdensServico = () => {
 
       {/* Formulário de Ordem de Serviço */}
       <Dialog open={openForm} onClose={handleCloseForm} maxWidth="md" fullWidth>
-        <DialogTitle>{editingId ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}</DialogTitle>
+        <DialogTitle>
+          {editingId ? "Editar Ordem de Serviço" : "Nova Ordem de Serviço"}
+        </DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={12} sm={6}>
@@ -930,7 +996,8 @@ const OrdensServico = () => {
                 >
                   {veiculos.map((veiculo) => (
                     <MenuItem key={veiculo.id} value={veiculo.id}>
-                      {veiculo.marca} {veiculo.modelo} - {veiculo.placa} ({getClienteInfo(veiculo.id)})
+                      {veiculo.marca} {veiculo.modelo} - {veiculo.placa} (
+                      {getClienteInfo(veiculo.id)})
                     </MenuItem>
                   ))}
                 </Select>
@@ -955,22 +1022,32 @@ const OrdensServico = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="pt-br"
+              >
                 <DatePicker
                   label="Data de Entrada"
                   value={formData.dataEntrada}
-                  onChange={(date) => handleDateChange(date, 'dataEntrada')}
-                  slotProps={{ textField: { fullWidth: true, margin: 'dense' } }}
+                  onChange={(date) => handleDateChange(date, "dataEntrada")}
+                  slotProps={{
+                    textField: { fullWidth: true, margin: "dense" },
+                  }}
                 />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+              <LocalizationProvider
+                dateAdapter={AdapterDayjs}
+                adapterLocale="pt-br"
+              >
                 <DatePicker
                   label="Data de Saída"
                   value={formData.dataSaida}
-                  onChange={(date) => handleDateChange(date, 'dataSaida')}
-                  slotProps={{ textField: { fullWidth: true, margin: 'dense' } }}
+                  onChange={(date) => handleDateChange(date, "dataSaida")}
+                  slotProps={{
+                    textField: { fullWidth: true, margin: "dense" },
+                  }}
                 />
               </LocalizationProvider>
             </Grid>
@@ -995,14 +1072,18 @@ const OrdensServico = () => {
                   labelId="servicos-label"
                   multiple
                   value={formData.servicosIds}
-                  onChange={(e) => handleMultiSelectChange(e, 'servicosIds')}
+                  onChange={(e) => handleMultiSelectChange(e, "servicosIds")}
                   label="Serviços"
                   renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                       {(selected as string[]).map((value) => {
-                        const servico = servicos.find(s => s.id === value);
+                        const servico = servicos.find((s) => s.id === value);
                         return (
-                          <Chip key={value} label={servico ? servico.nome : value} size="small" />
+                          <Chip
+                            key={value}
+                            label={servico ? servico.nome : value}
+                            size="small"
+                          />
                         );
                       })}
                     </Box>
@@ -1023,14 +1104,18 @@ const OrdensServico = () => {
                   labelId="pecas-label"
                   multiple
                   value={formData.pecasIds}
-                  onChange={(e) => handleMultiSelectChange(e, 'pecasIds')}
+                  onChange={(e) => handleMultiSelectChange(e, "pecasIds")}
                   label="Peças"
                   renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                       {(selected as string[]).map((value) => {
-                        const peca = pecas.find(p => p.id === value);
+                        const peca = pecas.find((p) => p.id === value);
                         return (
-                          <Chip key={value} label={peca ? peca.nome : value} size="small" />
+                          <Chip
+                            key={value}
+                            label={peca ? peca.nome : value}
+                            size="small"
+                          />
                         );
                       })}
                     </Box>
@@ -1066,7 +1151,8 @@ const OrdensServico = () => {
         <DialogTitle>Confirmar Exclusão</DialogTitle>
         <DialogContent>
           <Typography>
-            Tem certeza que deseja excluir esta ordem de serviço? Esta ação não pode ser desfeita.
+            Tem certeza que deseja excluir esta ordem de serviço? Esta ação não
+            pode ser desfeita.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -1084,9 +1170,13 @@ const OrdensServico = () => {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

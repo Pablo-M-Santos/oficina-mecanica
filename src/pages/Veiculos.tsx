@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import api from "../services/api";
 import {
   Box,
   Button,
@@ -25,12 +25,12 @@ import {
   Select,
   MenuItem,
   InputAdornment,
-  TableSortLabel
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SearchIcon from '@mui/icons-material/Search';
+  TableSortLabel,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface Veiculo {
   id: number;
@@ -55,11 +55,11 @@ interface VeiculoFormData {
 }
 
 const veiculoVazio: VeiculoFormData = {
-  clienteId: '',
-  marca: '',
-  modelo: '',
+  clienteId: "",
+  marca: "",
+  modelo: "",
   ano: new Date().getFullYear(),
-  placa: ''
+  placa: "",
 };
 
 const Veiculos = () => {
@@ -70,28 +70,30 @@ const Veiculos = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [formData, setFormData] = useState<VeiculoFormData>(veiculoVazio);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [veiculoParaDeletar, setVeiculoParaDeletar] = useState<number | null>(null);
+  const [veiculoParaDeletar, setVeiculoParaDeletar] = useState<number | null>(
+    null,
+  );
   const [snackbar, setSnackbar] = useState({
     open: false,
-    message: '',
-    severity: 'success' as 'success' | 'error' | 'info' | 'warning'
+    message: "",
+    severity: "success" as "success" | "error" | "info" | "warning",
   });
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const [veiculosRes, clientesRes] = await Promise.all([
-        axios.get('http://localhost:3001/veiculos'),
-        axios.get('http://localhost:3001/clientes')
+        api.get("/veiculos"),
+        api.get("/clientes"),
       ]);
       setVeiculos(veiculosRes.data);
       setClientes(clientesRes.data);
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error("Erro ao buscar dados:", error);
       setSnackbar({
         open: true,
-        message: 'Erro ao carregar dados',
-        severity: 'error'
+        message: "Erro ao carregar dados",
+        severity: "error",
       });
     } finally {
       setLoading(false);
@@ -105,7 +107,7 @@ const Veiculos = () => {
         marca: veiculo.marca,
         modelo: veiculo.modelo,
         ano: veiculo.ano,
-        placa: veiculo.placa
+        placa: veiculo.placa,
       });
       setEditingId(veiculo.id);
     } else {
@@ -122,44 +124,44 @@ const Veiculos = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'ano' ? Number(value) : value
+      [name]: name === "ano" ? Number(value) : value,
     }));
   };
 
   const handleSelectChange = (e: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      clienteId: e.target.value
+      clienteId: e.target.value,
     }));
   };
 
   const handleSubmit = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:3001/veiculos/${editingId}`, formData);
+        await api.put(`/veiculos/${editingId}`, formData);
         setSnackbar({
           open: true,
-          message: 'Veículo atualizado com sucesso',
-          severity: 'success'
+          message: "Veículo atualizado com sucesso",
+          severity: "success",
         });
       } else {
-        await axios.post('http://localhost:3001/veiculos', formData);
+        await api.post("/veiculos", formData);
         setSnackbar({
           open: true,
-          message: 'Veículo adicionado com sucesso',
-          severity: 'success'
+          message: "Veículo adicionado com sucesso",
+          severity: "success",
         });
       }
       handleCloseForm();
       fetchData();
     } catch (error) {
-      console.error('Erro ao salvar veículo:', error);
+      console.error("Erro ao salvar veículo:", error);
       setSnackbar({
         open: true,
-        message: 'Erro ao salvar veículo',
-        severity: 'error'
+        message: "Erro ao salvar veículo",
+        severity: "error",
       });
     }
   };
@@ -177,19 +179,19 @@ const Veiculos = () => {
   const handleDelete = async () => {
     if (veiculoParaDeletar) {
       try {
-        await axios.delete(`http://localhost:3001/veiculos/${veiculoParaDeletar}`);
+        await api.delete(`/veiculos/${veiculoParaDeletar}`);
         setSnackbar({
           open: true,
-          message: 'Veículo excluído com sucesso',
-          severity: 'success'
+          message: "Veículo excluído com sucesso",
+          severity: "success",
         });
         fetchData();
       } catch (error) {
-        console.error('Erro ao excluir veículo:', error);
+        console.error("Erro ao excluir veículo:", error);
         setSnackbar({
           open: true,
-          message: 'Erro ao excluir veículo',
-          severity: 'error'
+          message: "Erro ao excluir veículo",
+          severity: "error",
         });
       }
       handleCloseDelete();
@@ -197,20 +199,20 @@ const Veiculos = () => {
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const getClienteNome = (clienteId: string) => {
-    const cliente = clientes.find(c => c.id === clienteId);
-    return cliente ? cliente.nome : 'Cliente não encontrado';
+    const cliente = clientes.find((c) => c.id === clienteId);
+    return cliente ? cliente.nome : "Cliente não encontrado";
   };
 
   const [veiculosFiltrados, setVeiculosFiltrados] = useState<Veiculo[]>([]);
-  const [filtro, setFiltro] = useState('');
+  const [filtro, setFiltro] = useState("");
   const [ordenacao, setOrdenacao] = useState<{
-    campo: keyof Veiculo | '';
-    direcao: 'asc' | 'desc';
-  }>({ campo: '', direcao: 'asc' });
+    campo: keyof Veiculo | "";
+    direcao: "asc" | "desc";
+  }>({ campo: "", direcao: "asc" });
 
   useEffect(() => {
     fetchData();
@@ -225,11 +227,11 @@ const Veiculos = () => {
   const handleFiltroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const valorFiltro = event.target.value.toLowerCase();
     setFiltro(valorFiltro);
-    
-    if (valorFiltro === '') {
+
+    if (valorFiltro === "") {
       setVeiculosFiltrados(veiculos);
     } else {
-      const filtrados = veiculos.filter(veiculo => {
+      const filtrados = veiculos.filter((veiculo) => {
         const clienteNome = getClienteNome(veiculo.clienteId).toLowerCase();
         return (
           veiculo.marca.toLowerCase().includes(valorFiltro) ||
@@ -245,18 +247,19 @@ const Veiculos = () => {
 
   const handleOrdenacaoChange = (campo: keyof Veiculo) => {
     const ehMesmoCampo = ordenacao.campo === campo;
-    const novaDirecao = ehMesmoCampo && ordenacao.direcao === 'asc' ? 'desc' : 'asc';
-    
+    const novaDirecao =
+      ehMesmoCampo && ordenacao.direcao === "asc" ? "desc" : "asc";
+
     setOrdenacao({
       campo,
-      direcao: novaDirecao
+      direcao: novaDirecao,
     });
 
     const veiculosOrdenados = [...veiculosFiltrados].sort((a, b) => {
-      if (campo === 'clienteId') {
+      if (campo === "clienteId") {
         const nomeClienteA = getClienteNome(a.clienteId).toLowerCase();
         const nomeClienteB = getClienteNome(b.clienteId).toLowerCase();
-        return novaDirecao === 'asc' 
+        return novaDirecao === "asc"
           ? nomeClienteA.localeCompare(nomeClienteB)
           : nomeClienteB.localeCompare(nomeClienteA);
       }
@@ -264,14 +267,14 @@ const Veiculos = () => {
       const aValue = a[campo];
       const bValue = b[campo];
 
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return novaDirecao === 'asc'
-          ? aValue.localeCompare(bValue, 'pt-BR')
-          : bValue.localeCompare(aValue, 'pt-BR');
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return novaDirecao === "asc"
+          ? aValue.localeCompare(bValue, "pt-BR")
+          : bValue.localeCompare(aValue, "pt-BR");
       }
 
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
-        return novaDirecao === 'asc' ? aValue - bValue : bValue - aValue;
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return novaDirecao === "asc" ? aValue - bValue : bValue - aValue;
       }
 
       return 0;
@@ -282,8 +285,21 @@ const Veiculos = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
-        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }} gutterBottom>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
+          mb: 3,
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{ fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" } }}
+          gutterBottom
+        >
           Veículos
         </Typography>
         <Button
@@ -292,7 +308,7 @@ const Veiculos = () => {
           startIcon={<AddIcon />}
           onClick={() => handleOpenForm()}
           fullWidth={window.innerWidth < 600}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          sx={{ width: { xs: "100%", sm: "auto" } }}
         >
           Novo Veículo
         </Button>
@@ -316,56 +332,72 @@ const Veiculos = () => {
       </Box>
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       ) : (
-        <TableContainer component={Paper} elevation={3} sx={{ overflowX: 'auto' }}>
+        <TableContainer
+          component={Paper}
+          elevation={3}
+          sx={{ overflowX: "auto" }}
+        >
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'clienteId'}
-                    direction={ordenacao.campo === 'clienteId' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('clienteId')}
+                    active={ordenacao.campo === "clienteId"}
+                    direction={
+                      ordenacao.campo === "clienteId"
+                        ? ordenacao.direcao
+                        : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("clienteId")}
                   >
                     Cliente
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'marca'}
-                    direction={ordenacao.campo === 'marca' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('marca')}
+                    active={ordenacao.campo === "marca"}
+                    direction={
+                      ordenacao.campo === "marca" ? ordenacao.direcao : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("marca")}
                   >
                     Marca
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'modelo'}
-                    direction={ordenacao.campo === 'modelo' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('modelo')}
+                    active={ordenacao.campo === "modelo"}
+                    direction={
+                      ordenacao.campo === "modelo" ? ordenacao.direcao : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("modelo")}
                   >
                     Modelo
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'ano'}
-                    direction={ordenacao.campo === 'ano' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('ano')}
+                    active={ordenacao.campo === "ano"}
+                    direction={
+                      ordenacao.campo === "ano" ? ordenacao.direcao : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("ano")}
                   >
                     Ano
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={ordenacao.campo === 'placa'}
-                    direction={ordenacao.campo === 'placa' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('placa')}
+                    active={ordenacao.campo === "placa"}
+                    direction={
+                      ordenacao.campo === "placa" ? ordenacao.direcao : "asc"
+                    }
+                    onClick={() => handleOrdenacaoChange("placa")}
                   >
                     Placa
                   </TableSortLabel>
@@ -415,7 +447,9 @@ const Veiculos = () => {
 
       {/* Formulário de Veículo */}
       <Dialog open={openForm} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingId ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
+        <DialogTitle>
+          {editingId ? "Editar Veículo" : "Novo Veículo"}
+        </DialogTitle>
         <DialogContent>
           <FormControl fullWidth margin="dense" sx={{ mb: 2, mt: 1 }}>
             <InputLabel id="cliente-label">Cliente</InputLabel>
@@ -491,7 +525,8 @@ const Veiculos = () => {
         <DialogTitle>Confirmar Exclusão</DialogTitle>
         <DialogContent>
           <Typography>
-            Tem certeza que deseja excluir este veículo? Esta ação não pode ser desfeita.
+            Tem certeza que deseja excluir este veículo? Esta ação não pode ser
+            desfeita.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -509,9 +544,13 @@ const Veiculos = () => {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
